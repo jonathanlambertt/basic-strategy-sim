@@ -67,7 +67,7 @@ Invalid engine calls don't throw. They call `push_error` and return an empty eve
 - There are no image or font assets. `Art` holds the palette and generates the card and chip textures in code. `PixelFont` is a 5×7 bitmap font that only has uppercase glyphs. Text is uppercased before drawing, and any character missing from `GLYPHS` is drawn as `?`.
 - The UI draws itself with custom `_draw` code (`PixelButton`, `ChipButton`, the HUD in `game.gd::_draw_hud`), not with Godot Control themes.
 - The viewport is 640×360 with integer scaling and nearest-neighbour filtering. Positions are rounded to whole pixels, and new drawing code should round them too.
-- Full-screen panels (chart, stats, table rules) subclass `Overlay`. They override `_draw_content()` and `handle_key()`, and `game.gd::_open_overlay(kind)` opens them. Overlays sit on CanvasLayer 5 and the CRT shader pass on layer 10.
+- Full-screen panels (chart, stats, table rules) subclass `Overlay`. They override `_draw_content()` and `handle_key()`, and `game.gd::_open_overlay(kind)` opens them. Overlays sit on CanvasLayer 5.
 - `game.gd::_unhandled_input` handles every keyboard shortcut. `_press(button)` only fires a button that is visible and enabled.
 - `tests/shots.gd` calls private methods directly: `_on_deal`, `_on_action`, `_on_insurance`, `_open_overlay`, `_close_overlay`, `overlay.set_tab`, `overlay._scroll_by` and `overlay._choose`. Renaming any of them breaks the screenshot script.
 

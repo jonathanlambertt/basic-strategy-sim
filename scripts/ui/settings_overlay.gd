@@ -3,7 +3,7 @@ extends Overlay
 ## Table rules (which drive the strategy chart) and display options.
 
 signal rules_changed(new_rules: Rules)
-signal display_changed(fast: bool, crt: bool)
+signal display_changed(fast: bool)
 signal bankroll_reset
 
 const OPT_X := 230
@@ -11,7 +11,6 @@ const KEYS_X := 452
 
 var rules: Rules
 var fast := false
-var crt := true
 var is_locked: Callable = func() -> bool: return false
 
 var _opts := [] # [{button, row, value}]
@@ -20,11 +19,10 @@ var _bank_btn: PixelButton
 var _locked := false
 
 
-func _init(current: Rules = null, fast_anim: bool = false, crt_on: bool = true) -> void:
+func _init(current: Rules = null, fast_anim: bool = false) -> void:
 	super()
 	rules = current.copy() if current else Rules.new()
 	fast = fast_anim
-	crt = crt_on
 	title = "TABLE RULES"
 
 
@@ -35,7 +33,6 @@ func _ready() -> void:
 	_add_row("das", 116, [["ALLOWED", true], ["NOT ALLOWED", false]], 76, true)
 	_add_row("surrender", 144, [["ALLOWED", true], ["NOT ALLOWED", false]], 76, true)
 	_add_row("fast", 240, [["NORMAL", false], ["FAST", true]], 70, false)
-	_add_row("crt", 268, [["ON", true], ["OFF", false]], 50, false)
 	_bank_btn = PixelButton.make("RESET BANKROLL TO $1,000", Rect2(24, 318, 170, 20), Art.RED, Art.RED_D)
 	_bank_btn.pressed.connect(func() -> void: bankroll_reset.emit())
 	add_child(_bank_btn)
@@ -73,8 +70,6 @@ func _value(row: String) -> Variant:
 			return rules.surrender
 		"fast":
 			return fast
-		"crt":
-			return crt
 	return null
 
 
@@ -89,12 +84,9 @@ func _choose(row: String, value: Variant) -> void:
 				return
 			rules = r
 			rules_changed.emit(rules.copy())
-		"fast", "crt":
-			if row == "fast":
-				fast = value
-			else:
-				crt = value
-			display_changed.emit(fast, crt)
+		"fast":
+			fast = value
+			display_changed.emit(fast)
 	_refresh()
 
 
@@ -129,7 +121,6 @@ func _draw_content() -> void:
 
 	PixelFont.draw(self, Vector2(24, 222), "DISPLAY", Art.GOLD)
 	_label(240, "ANIMATIONS", "")
-	_label(268, "CRT EFFECT", "")
 	PixelFont.draw(self, Vector2(24, 302), "BANKROLL", Art.GOLD)
 
 	# key reference

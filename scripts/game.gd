@@ -17,7 +17,6 @@ var bet := 25.0
 var display_bank := 0.0
 var busy := false
 var fast := false
-var crt_enabled := true
 var ui_phase := BlackjackEngine.Phase.BETTING
 
 var dealer_sprites: Array[CardSprite] = []
@@ -32,7 +31,6 @@ var hud: Control
 var cards_layer: Node2D
 var toast: Toast
 var overlay_layer: CanvasLayer
-var crt_layer: CanvasLayer
 var overlay: Overlay = null
 
 var btn_hit: PixelButton
@@ -83,17 +81,6 @@ func _ready() -> void:
 	overlay_layer = CanvasLayer.new()
 	overlay_layer.layer = 5
 	add_child(overlay_layer)
-
-	crt_layer = CanvasLayer.new()
-	crt_layer.layer = 10
-	var crt := ColorRect.new()
-	crt.size = Vector2(W, H)
-	crt.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var crt_mat := ShaderMaterial.new()
-	crt_mat.shader = load("res://shaders/crt.gdshader")
-	crt.material = crt_mat
-	crt_layer.add_child(crt)
-	add_child(crt_layer)
 
 	_refresh()
 
@@ -441,7 +428,7 @@ func _open_overlay(kind: String) -> void:
 			so.reset_requested.connect(func() -> void: engine.stats.reset())
 			overlay = so
 		"rules":
-			var st := SettingsOverlay.new(engine.rules, fast, crt_enabled)
+			var st := SettingsOverlay.new(engine.rules, fast)
 			st.is_locked = func() -> bool: return busy or not engine.is_between_rounds()
 			st.rules_changed.connect(_on_rules_changed)
 			st.display_changed.connect(_on_display_changed)
@@ -464,10 +451,8 @@ func _on_rules_changed(r: Rules) -> void:
 		toast.show_text("NEW %d-DECK SHOE" % r.decks, Art.GOLD)
 
 
-func _on_display_changed(f: bool, crt: bool) -> void:
+func _on_display_changed(f: bool) -> void:
 	fast = f
-	crt_enabled = crt
-	crt_layer.visible = crt
 
 
 func _on_bankroll_reset() -> void:
